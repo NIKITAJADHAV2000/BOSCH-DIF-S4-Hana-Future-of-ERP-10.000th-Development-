@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>BOSCH – DIF – S4/Hana – Future of ERP – 10.000th Development</title>
+    <style>
+        :root {
+            --bg-0: #0a0b0d;
+            --bg-1: #0f1116;
+            --bg-2: #10131a;
+            --text-0: #e8e8ea;
+            --text-1: #cfd2d7;
+            --accent-0: #c7d2ff;
+            --accent-1: #88b4ff;
+            --accent-2: #7ff3e6;
+            --gold: #f6e2a7;
+            --pill-bg: rgba(20, 24, 32, 0.7);
+            --pill-bright: rgba(200, 220, 255, 0.9);
+        }
+
+        * { box-sizing: border-box; }
+
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            margin: 0;
+            background: radial-gradient(1200px 800px at 20% 10%, var(--bg-2), transparent 60%),
+                        radial-gradient(900px 700px at 80% 0%, #0c0d12, transparent 55%),
+                        linear-gradient(180deg, var(--bg-1), var(--bg-0) 60%);
+            color: var(--text-0);
+            font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+            overflow: hidden;
+        }
+
+        /* Layers: stars (bg), fireworks (fx), content */
+        .stage {
+            position: fixed;
+            inset: 0;
+        }
+        canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+
+        .content {
+            position: relative;
+            z-index: 3;
+            height: 100%;
+            display: grid;
+            grid-template-rows: 1fr auto;
+        }
+
+        .hero {
+            align-self: center;
+            justify-self: center;
+            text-align: center;
+            padding: 2rem 3rem;
+            backdrop-filter: blur(2px) saturate(110%);
+            -webkit-backdrop-filter: blur(2px) saturate(110%);
+            background: linear-gradient(180deg, rgba(12,14,20,0.45), rgba(12,14,20,0.25));
+            border: 1px solid rgba(180,190,210,0.08);
+            border-radius: 18px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.03);
+            animation: heroFadeIn 1200ms ease-out both;
+        }
+
+        @keyframes heroFadeIn {
+            from { opacity: 0; transform: translateY(12px) scale(0.98); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .title {
+            margin: 0 0 0.4rem 0;
+            font-size: clamp(28px, 5.8vw, 90px);
+            line-height: 1.05;
+            letter-spacing: 0.02em;
+            color: transparent;
+            background: linear-gradient(92deg, #f0f3ff, #dfe9ff, #b9d0ff, #e9fcff, #f0f3ff);
+            background-size: 300% 100%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            filter: drop-shadow(0 0 24px rgba(120,160,255,0.12));
+            animation: shimmer 8s ease-in-out infinite, glowPulse 5.2s ease-in-out infinite;
+            transition: opacity 320ms ease, transform 320ms ease;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        @keyframes glowPulse {
+            0%, 100% { text-shadow: 0 0 0 rgba(136,180,255,0.0), 0 0 40px rgba(136,180,255,0.05); }
+            50% { text-shadow: 0 0 12px rgba(136,180,255,0.18), 0 0 50px rgba(127,243,230,0.10); }
+        }
+
+        .subtitle {
+            margin: 0;
+            font-size: clamp(14px, 1.6vw, 22px);
+            color: var(--text-1);
+            letter-spacing: 0.06em;
+            opacity: 0.9;
+            animation: subtitleFade 1800ms 200ms ease-out both;
+        }
+        @keyframes subtitleFade {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 0.9; transform: translateY(0); }
+        }
+
+        .footer {
+            align-self: end;
+            justify-self: center;
+            padding: 1rem 1.5rem 2rem;
+            color: var(--text-1);
+            font-size: 12px;
+            opacity: 0.8;
+            user-select: none;
+            animation: hintFade 1800ms 800ms ease-out both;
+        }
+        @keyframes hintFade {
+            from { opacity: 0; }
+            to { opacity: 0.8; }
+        }
+
+        .hint {
+            display: inline-flex;
+            gap: 10px;
+            align-items: center;
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: rgba(20,24,32,0.55);
+            border: 1px solid rgba(180,190,210,0.10);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.03), 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .dot {
+            width: 6px; height: 6px; border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #fff, #d6e3ff 50%, #86b2ff 100%);
+            box-shadow: 0 0 14px rgba(134,178,255,0.8), 0 0 40px rgba(127,243,230,0.35);
+            animation: twinkleDot 1.6s ease-in-out infinite;
+        }
+        @keyframes twinkleDot {
+            0%, 100% { transform: scale(1); opacity: 0.9; }
+            50% { transform: scale(1.35); opacity: 1; }
+        }
+
+        /* Easter-egg banner */
+        .banner {
+            position: fixed;
+            top: 22px; right: 22px;
+            z-index: 4;
+            padding: 10px 14px;
+            color: var(--text-0);
+            font-size: 13px;
+            letter-spacing: 0.02em;
+            background: var(--pill-bg);
+            border-radius: 999px;
+            border: 1px solid rgba(200,220,255,0.18);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.05);
+            display: none;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: opacity 500ms ease, transform 500ms ease;
+        }
+        .banner::before {
+            content: "";
+            position: absolute; inset: -2px;
+            border-radius: inherit;
+            background: linear-gradient(120deg, rgba(175,200,255,0.35), rgba(127,243,230,0.35));
+            filter: blur(10px); opacity: 0.25; z-index: -1;
+        }
+        .banner.show { display: inline-flex; opacity: 1; transform: translateY(0); }
+
+        /* Subtle floating bokeh for classy blink-blink */
+        .bokeh { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
+        .bokeh::before, .bokeh::after {
+            content: "";
+            position: absolute;
+            width: 700px; height: 700px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(180,210,255,0.08), rgba(180,210,255,0) 60%);
+            filter: blur(6px);
+            animation: drift 38s linear infinite;
+        }
+        .bokeh::after { width: 520px; height: 520px; animation-duration: 46s; animation-direction: reverse; }
+        @keyframes drift {
+            0% { transform: translate(-10%, -10%) }
+            50% { transform: translate(60%, 20%) }
+            100% { transform: translate(-10%, -10%) }
+        }
+    </style>
+</head>
+<body>
+    <div class="stage">
+        <canvas id="stars"></canvas>
+        <canvas id="fireworks"></canvas>
+    </div>
+
+    <div class="bokeh" aria-hidden="true"></div>
+
+    <div class="content">
+        <div class="hero">
+            <h1 class="title">BOSCH · DIF · S4/Hana · Future of ERP · 10.000th Development</h1>
+        </div>
+        <div class="footer">
+            <span class="hint"><span class="dot"></span> Zum Z&uuml;nden klicken oder tippen</span>
+        </div>
+    </div>
+
+    <div id="banner" class="banner" role="status" aria-live="polite"></div>
+
+    <script>
+        // HiDPI helpers
+        function resizeCanvasToDisplaySize(canvas, context) {
+            const dpr = Math.max(1, Math.min(2.5, window.devicePixelRatio || 1));
+            const { clientWidth, clientHeight } = canvas;
+            const displayWidth = Math.floor(clientWidth * dpr);
+            const displayHeight = Math.floor(clientHeight * dpr);
+            if (canvas.width !== displayWidth || canvas.height !== displayHeight) {
+                canvas.width = displayWidth;
+                canvas.height = displayHeight;
+                context.setTransform(dpr, 0, 0, dpr, 0, 0);
+            }
+            return dpr;
+        }
+
+        // Starfield (subtle twinkling)
+        const starsCanvas = document.getElementById('stars');
+        const starsCtx = starsCanvas.getContext('2d');
+        let stars = [];
+        let starDpr = 1;
+
+        function initStars() {
+            starDpr = resizeCanvasToDisplaySize(starsCanvas, starsCtx);
+            const baseCount = Math.floor((starsCanvas.clientWidth * starsCanvas.clientHeight) / 8000);
+            const count = Math.max(90, Math.min(450, baseCount));
+            stars = new Array(count).fill(0).map(() => {
+                return {
+                    x: Math.random() * starsCanvas.clientWidth,
+                    y: Math.random() * starsCanvas.clientHeight,
+                    r: Math.random() * 0.9 + 0.2,
+                    a: Math.random() * 0.5 + 0.2,
+                    tw: Math.random() * 0.8 + 0.2,
+                    ph: Math.random() * Math.PI * 2,
+                    tint: Math.random() < 0.6 ? '#cfe2ff' : (Math.random() < 0.5 ? '#a6dfff' : '#f6e2a7')
+                };
+            });
+        }
+
+        function drawStars(t) {
+            starsCtx.clearRect(0, 0, starsCanvas.clientWidth, starsCanvas.clientHeight);
+            for (const s of stars) {
+                const twinkle = s.a * (0.5 + 0.5 * Math.sin(t * 0.001 * s.tw + s.ph));
+                starsCtx.globalAlpha = twinkle;
+                starsCtx.fillStyle = s.tint;
+                starsCtx.beginPath();
+                starsCtx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+                starsCtx.fill();
+            }
+            starsCtx.globalAlpha = 1;
+        }
+
+        // Fireworks engine
+        const fwCanvas = document.getElementById('fireworks');
+        const fwCtx = fwCanvas.getContext('2d');
+        let fwDpr = 1;
+
+        const particles = [];
+        const rockets = [];
+
+        function resizeFireworks() {
+            fwDpr = resizeCanvasToDisplaySize(fwCanvas, fwCtx);
+        }
+
+        function randomBetween(min, max) { return Math.random() * (max - min) + min; }
+
+        function hsvToRgb(h, s, v) {
+            let f = (n, k = (n + h / 60) % 6) => v - v * s * Math.max(Math.min(k, 4 - k, 1), 0);
+            return [f(5), f(3), f(1)];
+        }
+
+        class Particle {
+            constructor(x, y, speed, angle, color, size, life, sparkle) {
+                this.x = x; this.y = y;
+                this.vx = Math.cos(angle) * speed;
+                this.vy = Math.sin(angle) * speed;
+                this.drag = 0.985;
+                this.gravity = 0.08;
+                this.life = life; // ms
+                this.elapsed = 0;
+                this.size = size;
+                this.color = color; // CSS string
+                this.sparkle = sparkle;
+                this.dead = false;
+                this.opacity = 1;
+                this.trail = [];
+            }
+            update(dt) {
+                this.elapsed += dt;
+                if (this.elapsed >= this.life) { this.dead = true; return; }
+                this.trail.push({ x: this.x, y: this.y, o: this.opacity });
+                if (this.trail.length > 6) this.trail.shift();
+                this.vx *= this.drag;
+                this.vy = this.vy * this.drag + this.gravity;
+                this.x += this.vx;
+                this.y += this.vy;
+                // Fade out towards end of life
+                const remaining = 1 - this.elapsed / this.life;
+                this.opacity = Math.max(0, remaining);
+            }
+            render(ctx) {
+                // Trail
+                ctx.lineWidth = this.size * 0.6;
+                for (let i = 0; i < this.trail.length - 1; i++) {
+                    const a = this.trail[i];
+                    const b = this.trail[i + 1];
+                    ctx.strokeStyle = this.color;
+                    ctx.globalAlpha = a.o * 0.45;
+                    ctx.beginPath();
+                    ctx.moveTo(a.x, a.y);
+                    ctx.lineTo(b.x, b.y);
+                    ctx.stroke();
+                }
+                ctx.globalAlpha = this.opacity;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                // Sparkle overlay
+                if (this.sparkle && Math.random() < 0.15) {
+                    ctx.globalAlpha = this.opacity * 0.7;
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(this.x - this.size * 0.2, this.y - this.size * 0.2, this.size * 0.4, this.size * 0.4);
+                }
+                ctx.globalAlpha = 1;
+            }
+        }
+
+        class Rocket {
+            constructor(x, targetY, hueBase) {
+                this.x = x;
+                this.y = fwCanvas.clientHeight + 10;
+                this.targetY = targetY;
+                this.vx = randomBetween(-0.5, 0.5);
+                this.vy = randomBetween(-6.5, -8.5);
+                this.hueBase = hueBase;
+                this.dead = false;
+                this.trail = [];
+            }
+            update(dt) {
+                this.trail.push({ x: this.x, y: this.y });
+                if (this.trail.length > 14) this.trail.shift();
+                this.x += this.vx;
+                this.y += this.vy;
+                this.vy += 0.06; // gravity softens ascent
+                if (this.vy >= -0.6 || this.y <= this.targetY) {
+                    this.dead = true;
+                    explode(this.x, this.y, this.hueBase);
+                }
+            }
+            render(ctx) {
+                // Rocket trail
+                for (let i = 0; i < this.trail.length - 1; i++) {
+                    const a = this.trail[i];
+                    const b = this.trail[i + 1];
+                    const t = i / this.trail.length;
+                    ctx.strokeStyle = `rgba(180,210,255,${0.15 + t * 0.25})`;
+                    ctx.lineWidth = 1.8 * (1 - t);
+                    ctx.beginPath();
+                    ctx.moveTo(a.x, a.y);
+                    ctx.lineTo(b.x, b.y);
+                    ctx.stroke();
+                }
+                ctx.fillStyle = '#eaf2ff';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, 1.6, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function explode(x, y, hueBase = Math.floor(randomBetween(180, 220))) {
+            const layers = 2 + Math.floor(Math.random() * 2);
+            const count = 60 + Math.floor(Math.random() * 45);
+            for (let l = 0; l < layers; l++) {
+                const speedBase = 2.2 + l * 0.9;
+                for (let i = 0; i < count; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const spd = speedBase + Math.random() * 1.9;
+                    const sat = 0.35 + Math.random() * 0.25;
+                    const val = 0.9;
+                    const hue = (hueBase + (Math.random() * 40 - 20) + (l * 10)) % 360;
+                    const [r, g, b] = hsvToRgb(hue, sat, val);
+                    const color = `rgba(${Math.floor(r*255)}, ${Math.floor(g*255)}, ${Math.floor(b*255)}, 1)`;
+                    const size = Math.random() * 1.6 + 0.6;
+                    const life = 1200 + Math.random() * 700;
+                    const sparkle = Math.random() < 0.65;
+                    particles.push(new Particle(x, y, spd, angle, color, size, life, sparkle));
+                }
+            }
+            // Core flash
+            flashAt(x, y);
+        }
+
+        function flashAt(x, y) {
+            // subtle radial flash
+            const gradient = fwCtx.createRadialGradient(x, y, 0, x, y, 120);
+            gradient.addColorStop(0, 'rgba(255,255,255,0.25)');
+            gradient.addColorStop(0.4, 'rgba(200,230,255,0.12)');
+            gradient.addColorStop(1, 'rgba(0,0,0,0)');
+            fwCtx.save();
+            fwCtx.globalCompositeOperation = 'lighter';
+            fwCtx.fillStyle = gradient;
+            fwCtx.beginPath();
+            fwCtx.arc(x, y, 140, 0, Math.PI * 2);
+            fwCtx.fill();
+            fwCtx.restore();
+        }
+
+        let lastTime = performance.now();
+        let autoLaunchTimer = 0;
+        function loop(now) {
+            const dt = Math.min(32, now - lastTime); // clamp delta to avoid spikes
+            lastTime = now;
+
+            drawStars(now);
+
+            // Clear with slight opacity for trails
+            fwCtx.globalCompositeOperation = 'source-over';
+            fwCtx.fillStyle = 'rgba(10, 12, 18, 0.20)';
+            fwCtx.fillRect(0, 0, fwCanvas.clientWidth, fwCanvas.clientHeight);
+
+            // Update rockets
+            for (let i = rockets.length - 1; i >= 0; i--) {
+                const r = rockets[i];
+                r.update(dt);
+                r.render(fwCtx);
+                if (r.dead) rockets.splice(i, 1);
+            }
+
+            // Update particles
+            fwCtx.globalCompositeOperation = 'lighter';
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.update(dt);
+                p.render(fwCtx);
+                if (p.dead || p.y > fwCanvas.clientHeight + 40) {
+                    particles.splice(i, 1);
+                }
+            }
+            fwCtx.globalCompositeOperation = 'source-over';
+
+            // Auto-launch rockets periodically
+            autoLaunchTimer += dt;
+            const autoInterval = 1300 + Math.random() * 900;
+            if (autoLaunchTimer > autoInterval && rockets.length < 5) {
+                autoLaunchTimer = 0;
+                const x = randomBetween(fwCanvas.clientWidth * 0.12, fwCanvas.clientWidth * 0.88);
+                const targetY = randomBetween(fwCanvas.clientHeight * 0.18, fwCanvas.clientHeight * 0.45);
+                rockets.push(new Rocket(x, targetY, Math.floor(randomBetween(180, 260))));
+            }
+
+            requestAnimationFrame(loop);
+        }
+
+        function onPointer(evt) {
+            const rect = fwCanvas.getBoundingClientRect();
+            const x = (evt.clientX - rect.left);
+            const y = (evt.clientY - rect.top);
+            // Extra firework exactly at the clicked/tapped position
+            explode(x, y, Math.floor(randomBetween(160, 320)));
+        }
+
+        // Easter eggs
+        function dayOfYear(d) {
+            const start = new Date(d.getFullYear(), 0, 0);
+            const diff = d - start + ((start.getTimezoneOffset() - d.getTimezoneOffset()) * 60 * 1000);
+            return Math.floor(diff / (1000 * 60 * 60 * 24));
+        }
+        function getEasterEggMessage(now) {
+            const d = now || new Date();
+            const m = d.getMonth() + 1; // 1-based
+            const day = d.getDate();
+            const doy = dayOfYear(d); // 1-based
+            if (doy === 42) return "42th day - don't panic";
+            if (m === 5 && day === 4) return 'Starwars day: May the 4th be with you';
+            if (m === 1 && day === 1) return 'Traditional GoLive day today. Enjoy and do your work!';
+            if (m === 7 && day === 1) return '"Wroclaw GoLive"-Day - The first S4 BBM production plant.';
+            return '';
+        }
+        function showBanner(message, timeoutMs = 10000) {
+            if (!message) return;
+            const el = document.getElementById('banner');
+            el.textContent = message;
+            el.classList.add('show');
+            // Also fire a celebratory burst near the banner
+            const rect = fwCanvas.getBoundingClientRect();
+            const x = rect.width - 160;
+            const y = 90;
+            explode(x, y, 210);
+            setTimeout(() => {
+                el.classList.remove('show');
+            }, timeoutMs);
+        }
+
+        // Init
+        function onResize() {
+            initStars();
+            resizeFireworks();
+        }
+        window.addEventListener('resize', onResize);
+
+        onResize();
+        requestAnimationFrame(loop);
+        fwCanvas.addEventListener('pointerdown', onPointer);
+
+        // Rotate title words in an endless loop
+        const titleEl = document.querySelector('.title');
+        const titleWords = [
+            'BOSCH',
+            'DIF',
+            'S4/Hana',
+            'Future of ERP',
+            '10.000th Development'
+        ];
+        let titleIndex = 0;
+        function cycleTitleWord() {
+            titleEl.style.opacity = 0;
+            titleEl.style.transform = 'translateY(8px)';
+            setTimeout(() => {
+                titleEl.textContent = titleWords[titleIndex];
+                titleIndex = (titleIndex + 1) % titleWords.length;
+                titleEl.style.opacity = 1;
+                titleEl.style.transform = 'translateY(0)';
+            }, 280);
+        }
+        // Initialize and start loop
+        titleEl.textContent = titleWords[0];
+        titleIndex = 1;
+        setInterval(cycleTitleWord, 1800);
+
+        // Warm welcome burst
+        setTimeout(() => {
+            const x = fwCanvas.clientWidth * 0.5;
+            const y = fwCanvas.clientHeight * 0.32;
+            explode(x, y, 210);
+        }, 900);
+
+        // Easter egg banner
+        showBanner(getEasterEggMessage(new Date()));
+    </script>
+</body>
+</html>
